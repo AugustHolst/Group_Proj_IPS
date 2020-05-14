@@ -1,0 +1,6 @@
+fun int mul(int x, int y) =
+    x + y
+
+fun int main() = 
+    let x = read(int); y = 2 in
+    write(mul(x,y))
