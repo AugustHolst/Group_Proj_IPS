@@ -20,33 +20,31 @@ _stop_:
 # Function main
 main:
 	sw	$31, -4($29)
-	sw	$17, -12($29)
 	sw	$16, -8($29)
-	addi	$29, $29, -16
-	ori	$16, $0, 3
-# was:	ori	_letBind_2_, $0, 3
-	ori	$17, $0, 2
-# was:	ori	_letBind_3_, $0, 2
-	jal	getint
-# was:	jal	getint, $2
-# 	ori	_letBind_4_,$2,0
-# 	ori	_plus_L_8_,_letBind_4_,0
-# 	ori	_plus_R_9_,_letBind_3_,0
-	add	$2, $2, $17
-# was:	add	_plus_L_6_, _plus_L_8_, _plus_R_9_
-# 	ori	_plus_R_7_,_letBind_2_,0
-	add	$16, $2, $16
-# was:	add	_letBind_5_, _plus_L_6_, _plus_R_7_
-# 	ori	_tmp_10_,_letBind_5_,0
-# 	ori	_mainres_1_,_tmp_10_,0
+	addi	$29, $29, -12
+	ori	$3, $0, 10
+# was:	ori	_letBind_2_, $0, 10
+	ori	$2, $0, 4
+# was:	ori	_letBind_3_, $0, 4
+# 	ori	_times_L_5_,_letBind_3_,0
+# 	ori	_times_R_6_,_letBind_2_,0
+	mul	$2, $2, $3
+# was:	mul	_letBind_4_, _times_L_5_, _times_R_6_
+# 	ori	_divide_L_8_,_letBind_4_,0
+	ori	$3, $0, 8
+# was:	ori	_divide_R_9_, $0, 8
+	div	$2, $2, $3
+# was:	div	_letBind_7_, _divide_L_8_, _divide_R_9_
+# 	ori	_tmp_10_,_letBind_7_,0
+	ori	$16, $2, 0
+# was:	ori	_mainres_1_, _tmp_10_, 0
 	ori	$2, $16, 0
 # was:	ori	$2, _mainres_1_, 0
 	jal	putint
 # was:	jal	putint, $2
 	ori	$2, $16, 0
 # was:	ori	$2, _mainres_1_, 0
-	addi	$29, $29, 16
-	lw	$17, -12($29)
+	addi	$29, $29, 12
 	lw	$16, -8($29)
 	lw	$31, -4($29)
 	jr	$31

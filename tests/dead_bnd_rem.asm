@@ -20,33 +20,64 @@ _stop_:
 # Function main
 main:
 	sw	$31, -4($29)
-	sw	$17, -12($29)
 	sw	$16, -8($29)
-	addi	$29, $29, -16
-	ori	$16, $0, 3
-# was:	ori	_letBind_2_, $0, 3
-	ori	$17, $0, 2
-# was:	ori	_letBind_3_, $0, 2
+	addi	$29, $29, -12
 	jal	getint
 # was:	jal	getint, $2
-# 	ori	_letBind_4_,$2,0
-# 	ori	_plus_L_8_,_letBind_4_,0
-# 	ori	_plus_R_9_,_letBind_3_,0
-	add	$2, $2, $17
-# was:	add	_plus_L_6_, _plus_L_8_, _plus_R_9_
-# 	ori	_plus_R_7_,_letBind_2_,0
-	add	$16, $2, $16
-# was:	add	_letBind_5_, _plus_L_6_, _plus_R_7_
-# 	ori	_tmp_10_,_letBind_5_,0
-# 	ori	_mainres_1_,_tmp_10_,0
+# 	ori	_letBind_2_,$2,0
+# 	ori	_times_L_4_,_letBind_2_,0
+	ori	$3, $2, 0
+# was:	ori	_times_R_5_, _letBind_2_, 0
+	mul	$4, $2, $3
+# was:	mul	_letBind_3_, _times_L_4_, _times_R_5_
+# 	ori	_plus_L_9_,_letBind_3_,0
+	ori	$3, $0, 3
+# was:	ori	_plus_R_10_, $0, 3
+	add	$3, $4, $3
+# was:	add	_letBind_8_, _plus_L_9_, _plus_R_10_
+# 	ori	_plus_L_12_,_letBind_8_,0
+# 	ori	_plus_R_13_,_letBind_2_,0
+	add	$3, $3, $2
+# was:	add	_letBind_11_, _plus_L_12_, _plus_R_13_
+# 	ori	_plus_L_14_,_letBind_11_,0
+	ori	$4, $0, 8
+# was:	ori	_plus_R_15_, $0, 8
+	add	$0, $3, $4
+# was:	add	_letBind_7_, _plus_L_14_, _plus_R_15_
+# 	ori	_letBind_6_,_letBind_2_,0
+	ori	$4, $2, 0
+# was:	ori	_plus_L_17_, _letBind_2_, 0
+	ori	$3, $0, 2
+# was:	ori	_plus_R_18_, $0, 2
+	add	$3, $4, $3
+# was:	add	_letBind_16_, _plus_L_17_, _plus_R_18_
+# 	ori	_plus_L_22_,_letBind_16_,0
+	ori	$4, $0, 2
+# was:	ori	_plus_R_23_, $0, 2
+	add	$4, $3, $4
+# was:	add	_plus_L_20_, _plus_L_22_, _plus_R_23_
+	ori	$5, $2, 0
+# was:	ori	_plus_R_21_, _letBind_6_, 0
+	add	$0, $4, $5
+# was:	add	_letBind_19_, _plus_L_20_, _plus_R_21_
+# 	ori	_plus_L_26_,_letBind_2_,0
+	ori	$4, $0, 3
+# was:	ori	_plus_R_27_, $0, 3
+	add	$2, $2, $4
+# was:	add	_letBind_25_, _plus_L_26_, _plus_R_27_
+# 	ori	_times_L_28_,_letBind_16_,0
+# 	ori	_times_R_29_,_letBind_25_,0
+	mul	$16, $3, $2
+# was:	mul	_letBind_24_, _times_L_28_, _times_R_29_
+# 	ori	_tmp_30_,_letBind_24_,0
+# 	ori	_mainres_1_,_tmp_30_,0
 	ori	$2, $16, 0
 # was:	ori	$2, _mainres_1_, 0
 	jal	putint
 # was:	jal	putint, $2
 	ori	$2, $16, 0
 # was:	ori	$2, _mainres_1_, 0
-	addi	$29, $29, 16
-	lw	$17, -12($29)
+	addi	$29, $29, 12
 	lw	$16, -8($29)
 	lw	$31, -4($29)
 	jr	$31

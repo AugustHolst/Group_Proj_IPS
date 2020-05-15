@@ -118,6 +118,8 @@ Exp : NUM            { Constant (IntVal  (fst $1), snd $1) }
                      { ArrayLit ($2, (), $1) }
     | Exp PLUS  Exp  { Plus ($1, $3, $2) }
     | Exp MINUS Exp  { Minus($1, $3, $2) }
+    | Exp TIMES Exp  { Times($1, $3, $2) }
+    | Exp DIV   Exp  { Divide($1, $3, $2) }
     | Exp DEQ   Exp  { Equal($1, $3, $2) }
     | Exp LTH   Exp  { Less ($1, $3, $2) }
     | Exp AND   Exp  { And  ($1, $3, $2) }
@@ -148,7 +150,7 @@ Exp : NUM            { Constant (IntVal  (fst $1), snd $1) }
     | ID LBRACKET Exp RBRACKET
                      { Index (fst $1, $3, (), $2) }
     | LET VarDecs IN Exp %prec letprec
-                     { List.fold (fun acc x -> Let (x, acc, $1)) (Let ((List.head $2), $4, $1)) (List.tail $2) } //Ikke sikker på om den virker fuldstændig.
+                     { List.fold (fun acc x -> Let (x, acc, $1)) (Let ((List.head $2), $4, $1))  (List.tail $2)}
 //  | LET ID EQ Exp IN Exp %prec letprec
 //            { Let (Dec (fst $2, $4, $3), $6, $1) }
 
@@ -156,7 +158,6 @@ Exp : NUM            { Constant (IntVal  (fst $1), snd $1) }
 ;
 VarDecs : 
     | ID EQ Exp SEMICOLON VarDecs
-    // Det er noget med lister
                 {Dec (fst $1, $3, $2) :: $5}
     | ID EQ Exp
                 {Dec (fst $1, $3, $2) :: []}

@@ -1,0 +1,5 @@
+fun int main() = 
+    let x = 4; y = 10 in 
+    let z = x*y in 
+    let w = z/8 in
+    write(w)
