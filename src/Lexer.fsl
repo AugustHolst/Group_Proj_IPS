@@ -70,7 +70,7 @@ let keyword (s, pos) =
 
 (* specials: *)
        | "iota"         -> Parser.IOTA pos
-       | "replicate"    -> failwith "no implementation yet"//Parser.REPLICATE pos
+       | "replicate"    -> Parser.REPLICATE pos
        | "filter"       -> failwith "no implementation yet"//Parser.FILTER pos
        | "scan"         -> failwith "no implementation yet"//Parser.SCAN pos
        | "map"          -> Parser.MAP  pos

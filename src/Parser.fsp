@@ -41,9 +41,9 @@ let parse_error_rich =
 %token <char*(int*int)> CHARLIT
 %token <string*(int*int)> ID STRINGLIT
 %token <(int*int)> IF THEN ELSE LET IN EOF
-%token <(int*int)> INT CHAR BOOL NOT AND OR                     // NOT AND OR
-%token <(int*int)> PLUS MINUS LESS TIMES DIV                   // TIMES, DIV
-%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW NNEG REPLICATE   // NEG
+%token <(int*int)> INT CHAR BOOL NOT AND OR
+%token <(int*int)> PLUS MINUS LESS TIMES DIV
+%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW NNEG REPLICATE
 %token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
@@ -64,7 +64,7 @@ let parse_error_rich =
 %type <AbSyn.UntypedExp> Exp
 %type <AbSyn.UntypedExp list> Exps
 %type <AbSyn.UntypedFunArg> FunArg
-%type <AbSyn.UntypedDec list> VarDecs                  // Either untyped exp or declaration
+%type <AbSyn.UntypedDec list> VarDecs
 
 // TODO: Task 1(b): add any new nonterminals here
 
@@ -147,8 +147,6 @@ Exp : NUM            { Constant (IntVal  (fst $1), snd $1) }
     | LPAR Exp RPAR  { $2 }
     
     // TODO: task 1(b): replace this with a more general production
-
-
     | ID LBRACKET Exp RBRACKET
                      { Index (fst $1, $3, (), $2) }
     | LET VarDecs IN Exp %prec letprec

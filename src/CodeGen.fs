@@ -657,7 +657,6 @@ let rec compileExp  (e      : TypedExp)
   *)
   | Replicate (n, a, tp, (line, _)) ->
       let size_reg = newReg "size_reg"
-      let delete_reg = newReg "delete_reg" // delete
       let n_code = compileExp n vtable size_reg
       let a_reg = newReg "a_reg"
       let a_code = compileExp a vtable a_reg
@@ -666,7 +665,6 @@ let rec compileExp  (e      : TypedExp)
       let safe_lab = newLab "safe_lab"
       let checksize = [ Mips.BGEZ (size_reg, safe_lab)
                       ; Mips.LI (RN5, line)
-                      ; Mips.LI (delete_reg, 5) // delete
                       ; Mips.LA (RN6, "_Msg_IllegalArraySize_")
                       ; Mips.J "_RuntimeError_"
                       ; Mips.LABEL (safe_lab)

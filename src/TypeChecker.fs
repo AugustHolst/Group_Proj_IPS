@@ -295,8 +295,25 @@ and checkExp  (ftab : FunTable)
         - assuming `a` is of type `t` the result type
           of replicate is `[t]`
     *)
-    | Replicate (_, _, _, _) ->
-        failwith "Unimplemented type check of replicate"
+
+    (*| Iota (n_exp, pos) ->
+        let  (e_type, n_exp_dec) = checkExp ftab vtab n_exp
+        if e_type <> Int then
+          reportTypeWrong "argument of iota" Int e_type pos
+        (Array Int, Iota (n_exp_dec, pos))*)
+
+
+    | Replicate (n_exp, a_exp, tp, pos) ->
+        let (e_type, n_exp_dec) = checkExp ftab vtab n_exp
+        let (a_type, a_exp_dec) = checkExp ftab vtab a_exp
+        if e_type <> Int then
+          reportTypeWrong "argument of iota" Int e_type pos
+        match a_type with
+          | Int -> (Array Int, Replicate (n_exp_dec, a_exp_dec, Int, pos))
+          | Bool -> (Array Bool, Replicate (n_exp_dec, a_exp_dec, Bool, pos))
+          | Char -> (Array Char, Replicate (n_exp_dec, a_exp_dec, Char, pos))
+          | _ -> raise (MyError("Replicate second argument is not recognized", pos))
+        //failwith "Unimplemented type check of replicate"
 
     (* TODO project task 2: Hint for `filter(f, arr)`
         Look into the type-checking lecture slides for the type rule of `map`
