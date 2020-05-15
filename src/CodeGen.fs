@@ -655,8 +655,49 @@ let rec compileExp  (e      : TypedExp)
         If `n` is less than `0` then remember to terminate the program with
         an error -- see implementation of `iota`.
   *)
-  | Replicate (_, _, _, _) ->
-      failwith "Unimplemented code generation of replicate"
+  | Replicate (n, a, tp, (line, _)) ->
+      let size_reg = newReg "size_reg"
+      let delete_reg = newReg "delete_reg" // delete
+      let n_code = compileExp n vtable size_reg
+      let a_reg = newReg "a_reg"
+      let a_code = compileExp a vtable a_reg
+
+      // Sørger for at n>0
+      let safe_lab = newLab "safe_lab"
+      let checksize = [ Mips.BGEZ (size_reg, safe_lab)
+                      ; Mips.LI (RN5, line)
+                      ; Mips.LI (delete_reg, 5) // delete
+                      ; Mips.LA (RN6, "_Msg_IllegalArraySize_")
+                      ; Mips.J "_RuntimeError_"
+                      ; Mips.LABEL (safe_lab)
+                      ]
+
+      // Det er en pointer til første element
+      let addr_reg = newReg "addr_reg"
+      let i_reg = newReg "i_reg"
+      let init_regs = [ Mips.ADDI (addr_reg, place, 4)
+                      ; Mips.MOVE (i_reg, RZ) ]
+      let loop_beg = newLab "loop_beg"
+      let loop_end = newLab "loop_end"
+      let tmp_reg = newReg "tmp_reg"
+      let loop_header = [ Mips.LABEL (loop_beg)
+                        ; Mips.SUB (tmp_reg, i_reg, size_reg)
+                        ; Mips.BGEZ (tmp_reg, loop_end)
+                        ]
+      let loop_replicate = [ Mips.SW (a_reg, addr_reg, 0)]
+      let loop_footer = [ Mips.ADDI (addr_reg, addr_reg, 4)
+                        ; Mips.ADDI (i_reg, i_reg, 1)
+                        ; Mips.J loop_beg
+                        ; Mips.LABEL loop_end
+                        ]
+      n_code
+       @ checksize
+       @ dynalloc (size_reg, place, tp)
+       @ init_regs
+       @ a_code
+       @ loop_header
+       @ loop_replicate
+       @ loop_footer
 
   (* TODO project task 2: see also the comment to replicate.
      (a) `filter(f, arr)`:  has some similarity with the implementation of map.

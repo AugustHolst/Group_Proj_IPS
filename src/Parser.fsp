@@ -43,7 +43,7 @@ let parse_error_rich =
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL NOT AND OR                     // NOT AND OR
 %token <(int*int)> PLUS MINUS LESS TIMES DIV                   // TIMES, DIV
-%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW NNEG    // NEG
+%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW NNEG REPLICATE   // NEG
 %token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
@@ -142,6 +142,8 @@ Exp : NUM            { Constant (IntVal  (fst $1), snd $1) }
                      { Reduce ($3, $5, $7, (), $1) }
     | REDUCE LPAR OP BinOp COMMA Exp COMMA Exp RPAR
                      { Reduce ($4, $6, $8, (), $1) }
+    | REPLICATE LPAR Exp COMMA Exp RPAR
+                     { Replicate ($3, $5, (), $1)}
     | LPAR Exp RPAR  { $2 }
     
     // TODO: task 1(b): replace this with a more general production
