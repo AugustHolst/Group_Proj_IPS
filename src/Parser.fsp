@@ -43,7 +43,7 @@ let parse_error_rich =
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL NOT AND OR
 %token <(int*int)> PLUS MINUS LESS TIMES DIV
-%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW NNEG REPLICATE
+%token <(int*int)> DEQ LTH EQ OP MAP REDUCE IOTA ARROW NEGATE REPLICATE FILTER SCAN
 %token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
@@ -54,7 +54,7 @@ let parse_error_rich =
 %left NOT
 %left PLUS MINUS
 %left TIMES DIV
-%left NNEG
+%left NEGATE
 
 %start Prog
 %type <AbSyn.UntypedProg> Prog
@@ -124,7 +124,7 @@ Exp : NUM            { Constant (IntVal  (fst $1), snd $1) }
     | Exp LTH   Exp  { Less ($1, $3, $2) }
     | Exp AND   Exp  { And  ($1, $3, $2) }
 	  | Exp OR    Exp  { Or   ($1, $3, $2) }
-    // tilføj parsing for gange og divider.
+    | NEGATE    Exp  { Negate ($2, $1) }    
     | IF Exp THEN Exp ELSE Exp %prec ifprec
                      { If ($2, $4, $6, $1) }
     | ID LPAR Exps RPAR
@@ -143,10 +143,12 @@ Exp : NUM            { Constant (IntVal  (fst $1), snd $1) }
     | REDUCE LPAR OP BinOp COMMA Exp COMMA Exp RPAR
                      { Reduce ($4, $6, $8, (), $1) }
     | REPLICATE LPAR Exp COMMA Exp RPAR
-                     { Replicate ($3, $5, (), $1)}
+                     { Replicate ($3, $5, (), $1) }
+    | FILTER LPAR FunArg COMMA Exp RPAR
+    				         { Filter ($3, $5, (), $1) }
+    | SCAN LPAR FunArg COMMA Exp COMMA Exp RPAR
+                     { Scan ($3, $5, $7, (), $1) }
     | LPAR Exp RPAR  { $2 }
-    
-    // TODO: task 1(b): replace this with a more general production
     | ID LBRACKET Exp RBRACKET
                      { Index (fst $1, $3, (), $2) }
     | LET VarDecs IN Exp %prec letprec

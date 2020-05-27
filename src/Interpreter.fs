@@ -278,15 +278,7 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
                List.fold (fun acc x -> evalFunArg (farg, vtab, ftab, pos, [acc;x])) nel lst
           | otherwise -> raise (MyError("Third argument of reduce is not an array: " + ppVal 0 arr
                                        , pos))
-  (* TODO project task 2: `replicate(n, a)`
-     Look in `AbSyn.fs` for the arguments of the `Replicate`
-     (`Map`,`Scan`) expression constructors.
-       - evaluate `n` then evaluate `a`,
-       - check that `n` evaluates to an integer value >= 0
-       - If so then create an array containing `n` replicas of
-         the value of `a`; otherwise raise an error (containing
-         a meaningful message).
-  *)
+
   | Replicate (n, a, tp, pos) ->
         let sz = evalExp(n, vtab, ftab)
         let a_val = evalExp(a, vtab, ftab)
@@ -311,15 +303,31 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
          under predicate `p`, i.e., `p(a) = true`;
        - create an `ArrayVal` from the (list) result of the previous step.
   *)
-  | Filter (_, _, _, _) ->
-        failwith "Unimplemented interpretation of map"
+
+  | Filter (p, arrexp, _, pos) ->
+        let arr = evalExp(arrexp, vtab, ftab)
+        let p_ret_type = rtpFunArg p ftab pos
+        if p_ret_type <> Bool then raise (MyError("function argument must return bool", pos))
+        match arr with
+          | ArrayVal (lst, tp1) ->
+               let mlst = List.filter (fun x -> (evalFunArg (p, vtab, ftab, pos, [x])) = BoolVal true) lst
+               ArrayVal (mlst, tp1)
+          | otherwise -> raise (MyError("Second argument of filter is not an array: "+ppVal 0 arr, pos))
+     
 
   (* TODO project task 2: `scan(f, ne, arr)`
      Implementation similar to reduce, except that it produces an array
      of the same type and length to the input array `arr`.
   *)
-  | Scan (_, _, _, _, _) ->
-        failwith "Unimplemented interpretation of scan"
+  | Scan (farg, ne, arrexp, tp, pos) ->
+        let farg_ret_type = rtpFunArg farg ftab pos
+        let arr  = evalExp(arrexp,vtab, ftab)
+        let nel  = evalExp(ne, vtab, ftab)
+        match arr with
+          | ArrayVal (lst,tp1) ->
+            ArrayVal(List.tail(List.scan (fun acc x -> evalFunArg (farg, vtab, ftab, pos, [acc;x])) nel lst),farg_ret_type)
+          | otherwise -> raise (MyError("Third argument of reduce is not an array: " + ppVal 0 arr
+                                       ,pos))
 
   | Read (t,p) ->
         let str = Console.ReadLine()

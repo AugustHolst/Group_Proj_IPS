@@ -71,8 +71,8 @@ let keyword (s, pos) =
 (* specials: *)
        | "iota"         -> Parser.IOTA pos
        | "replicate"    -> Parser.REPLICATE pos
-       | "filter"       -> failwith "no implementation yet"//Parser.FILTER pos
-       | "scan"         -> failwith "no implementation yet"//Parser.SCAN pos
+       | "filter"       -> Parser.FILTER pos
+       | "scan"         -> Parser.SCAN pos
        | "map"          -> Parser.MAP  pos
        | "reduce"       -> Parser.REDUCE pos
        | "read"         -> Parser.READ pos
@@ -123,7 +123,7 @@ rule Token = parse
   | ','                   { Parser.COMMA  (getPos lexbuf) }
   | '*'                   { Parser.TIMES  (getPos lexbuf) }
   | '/'                   { Parser.DIV    (getPos lexbuf) }
-  | '~'                   { Parser.NNEG   (getPos lexbuf) }
+  | '~'                   { Parser.NEGATE (getPos lexbuf) }
   | "&&"                  { Parser.AND    (getPos lexbuf) }
   | "||"                  { Parser.OR     (getPos lexbuf) }
   | ';'                   { Parser.SEMICOLON (getPos lexbuf) }

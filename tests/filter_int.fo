@@ -1,0 +1,12 @@
+fun int write_int(int x) = write(x)
+
+fun [int] write_int_array([int] x) = map(write_int, x)
+
+fun bool geq0(int a) =
+    if 0 < a then true
+    else false
+
+fun [int] main() =
+    let a = {1, 2, 3, 0-4, 0-5} in
+    let x = filter(geq0, a) in
+    write_int_array(x)

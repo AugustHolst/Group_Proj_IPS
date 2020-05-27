@@ -283,7 +283,7 @@ let rec compileExp  (e      : TypedExp)
   | Negate (e1, pos) ->
       let t1 = newReg "not_L"
       let code1 = compileExp e1 vtable t1
-      code1 @ [Mips.SUB (place, RZ, t1)] //ændret
+      code1 @ [Mips.SUB (place, RZ, t1)]
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable
       let code2 = compileExp e1 vtable1 place
@@ -661,7 +661,6 @@ let rec compileExp  (e      : TypedExp)
       let a_reg = newReg "a_reg"
       let a_code = compileExp a vtable a_reg
 
-      // Sørger for at n>0
       let safe_lab = newLab "safe_lab"
       let checksize = [ Mips.BGEZ (size_reg, safe_lab)
                       ; Mips.LI (RN5, line)
@@ -670,7 +669,6 @@ let rec compileExp  (e      : TypedExp)
                       ; Mips.LABEL (safe_lab)
                       ]
 
-      // Det er en pointer til første element
       let addr_reg = newReg "addr_reg"
       let i_reg = newReg "i_reg"
       let init_regs = [ Mips.ADDI (addr_reg, place, 4)
@@ -712,9 +710,61 @@ let rec compileExp  (e      : TypedExp)
          counter computed in step (c). You do this of course with a
          `Mips.SW(counter_reg, place, 0)` instruction.
   *)
-  | Filter (_, _, _, _) ->
-      failwith "Unimplemented code generation of map"
+  | Filter (farg, arr_exp, elem_type, pos) ->
+      let size_reg = newReg "size_reg"
+      let arr_reg = newReg "arr_reg"
+      let elem_reg = newReg "elem_reg"
+      let res_reg = newReg "res_reg"
+      let counter_reg = newReg "counter_reg"
+      let hold_reg = newReg "hold_reg"
+      let arr_code = compileExp arr_exp vtable arr_reg
 
+      let get_size = [ Mips.LW (size_reg, arr_reg, 0)]
+
+      let addr_reg = newReg "addr_reg"
+      let i_reg = newReg "i_reg"
+
+      let init_regs = [ Mips.ADDI (addr_reg, place, 4)
+                      ; Mips.MOVE (i_reg, RZ)
+                      ; Mips.MOVE (counter_reg, RZ)
+                      ; Mips.ADDI (elem_reg, arr_reg, 4)
+                      ]
+      let loop_beg = newLab "loop_beg"
+      let loop_end = newLab "loop_end"
+      let tmp_reg = newReg "tmp_reg"
+      let loop_footer = newLab "loop_footer"
+      let loop_header = [ Mips.LABEL (loop_beg)
+                        ; Mips.SUB (tmp_reg, i_reg, size_reg)
+                        ; Mips.BGEZ (tmp_reg, loop_end)
+                        ]
+      let src_size = getElemSize elem_type
+      let loop_filter = [ mipsLoad src_size (res_reg, elem_reg, 0) 
+                        ; mipsLoad src_size (hold_reg, elem_reg, 0) ]
+                        @ applyFunArg(farg, [res_reg], vtable, res_reg, pos)
+                        @ 
+                        [ Mips.BEQ (res_reg, RZ, loop_footer)
+                        ; mipsStore src_size (hold_reg, addr_reg, 0)
+                        ; Mips.ADDI (addr_reg, addr_reg, elemSizeToInt src_size)
+                        ; Mips.ADDI (counter_reg, counter_reg, 1)
+                        ]
+      
+      let loop_footer = [ Mips.LABEL loop_footer
+                        ; Mips.ADDI (elem_reg, elem_reg, elemSizeToInt src_size)
+                        ; Mips.ADDI (i_reg, i_reg, 1)
+                        ; Mips.J loop_beg
+                        ; Mips.LABEL loop_end
+                        ]
+
+      let fitarray = [ Mips.SW (counter_reg, place, 0) ]
+
+      arr_code
+      @ get_size
+      @ dynalloc (size_reg, place, elem_type)
+      @ init_regs
+      @ loop_header
+      @ loop_filter
+      @ loop_footer
+      @ fitarray
   (* TODO project task 2: see also the comment to replicate.
      `scan(f, ne, arr)`: you can inspire yourself from the implementation of
         `reduce`, but in the case of `scan` you will need to also maintain
