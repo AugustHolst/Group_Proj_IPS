@@ -338,7 +338,8 @@ and checkExp  (ftab : FunTable)
               scan's return type is the same as the type of `arr`,
               while reduce's return type is that of an element of `arr`).
     *)
-    | Scan (f, e_exp, arr_exp, _, pos) ->
+    | Scan (f, e_exp, arr_exp, _, pos) -> failwith "hej"
+    (*
         let (e_type  , e_dec  ) = checkExp ftab vtab e_exp
         let (arr_type, arr_dec) = checkExp ftab vtab arr_exp
         let elem_type =
@@ -364,6 +365,7 @@ and checkExp  (ftab : FunTable)
           reportTypesDifferent "operation and start-element types in Scan"
                                f_argres_type e_type pos
         (f_argres_type, Scan (f', e_dec, arr_dec, elem_type, pos))
+        *)
 
 and checkFunArg  (ftab : FunTable)
                  (vtab : VarTable)

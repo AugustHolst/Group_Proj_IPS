@@ -28,7 +28,11 @@ let rec copyConstPropFoldExp (vtable : VarTable)
                 exists and if so, it should replace the current expression
                 with the binded variable or constant.
             *)
-            failwith "Unimplemented copyConstPropFold for Var"
+            let nameLookup = SymTab.lookup name vtable
+            match nameLookup with
+                | Some(ConstProp valp) -> Constant(valp, pos)
+                | Some(VarProp varp) -> Var(varp, pos)
+                | None -> Var(name, pos)
         | Index (name, e, t, pos) ->
             (* TODO project task 3:
                 Should probably do the same as the `Var` case, for
@@ -38,23 +42,29 @@ let rec copyConstPropFoldExp (vtable : VarTable)
         | Let (Dec (name, e, decpos), body, pos) ->
             let e' = copyConstPropFoldExp vtable e
             match e' with
-                | Var (_, _) ->
+                | Var (vname, vpos) ->
                     (* TODO project task 3:
                         Hint: I have discovered a variable-copy statement `let x = a`.
                               I should probably record it in the `vtable` by
                               associating `x` with a variable-propagatee binding,
                               and optimize the `body` of the let.
                     *)
-                    failwith "Unimplemented copyConstPropFold for Let with Var"
-                | Constant (_, _) ->
+                    let vtable' = SymTab.bind name (VarProp vname) vtable
+                    let body' = copyConstPropFoldExp vtable' body
+                    Let (Dec (name, e', decpos), body', pos)
+                | Constant (cval, cpos) ->
                     (* TODO project task 3:
                         Hint: I have discovered a constant-copy statement `let x = 5`.
                               I should probably record it in the `vtable` by
                               associating `x` with a constant-propagatee binding,
                               and optimize the `body` of the let.
                     *)
-                    failwith "Unimplemented copyConstPropFold for Let with Constant"
-                | Let (_, _, _) ->
+                    let vtable' = SymTab.bind name (ConstProp cval) vtable
+                    let body' = copyConstPropFoldExp vtable' body
+                    Let (Dec (name, e', decpos), body', pos)
+                    
+                      //can be dec
+                | Let (ldec, e2, lpos) ->
                     (* TODO project task 3:
                         Hint: this has the structure
                                 `let y = (let x = e1 in e2) in e3`
@@ -66,7 +76,9 @@ let rec copyConstPropFoldExp (vtable : VarTable)
                         restructured, semantically-equivalent expression:
                                 `let x = e1 in let y = e2 in e3`
                     *)
-                    failwith "Unimplemented copyConstPropFold for Let with Let"
+                    let inner = copyConstPropFoldExp vtable (Let (Dec (name, e2, lpos), body, lpos))
+                    let outer = copyConstPropFoldExp vtable (Let (ldec, inner, pos))
+                    outer
                 | _ -> (* Fallthrough - for everything else, do nothing *)
                     let body' = copyConstPropFoldExp vtable body
                     Let (Dec (name, e', decpos), body', pos)

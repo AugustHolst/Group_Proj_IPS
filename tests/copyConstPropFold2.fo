@@ -1,0 +1,3 @@
+fun int main() = 
+    let x = 14; y = 7 - x / 2 in let z = y * (28 / 14 + 2) in
+    write(z)
