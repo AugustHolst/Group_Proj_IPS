@@ -118,12 +118,24 @@ let rec removeDeadBindingsInExp (e : TypedExp) : (bool * DBRtab * TypedExp) =
              List.fold SymTab.combine (SymTab.empty()) uses,
              Apply (fname, args', pos))
         | Index (name, e, t, pos) ->
+            let (eio, euses, e') = removeDeadBindingsInExp e
+            let table' = recordUse name (euses)
+            (eio,
+                table',
+                Index (name, e', t, pos))
+
+            (*| Var (name, pos) -> 
+            let table' = recordUse name (SymTab.empty())
+            (true, 
+             table',
+             Var (name, pos))*)
+
             (* Task 3, `Index` case: is similar to the `Var` case, except that,
                         additionally, you also need to recursively optimize the index
                         expression `e` and to propagate its results (in addition
                         to recording the use of `name`).
             *)
-            failwith "Unimplemented removeDeadBindingsInExp for Index"
+            //failwith "Unimplemented removeDeadBindingsInExp for Index"
 
         | Let (Dec (name, e, decpos), body, pos) ->
             let (io, uses, body') = removeDeadBindingsInExp body
