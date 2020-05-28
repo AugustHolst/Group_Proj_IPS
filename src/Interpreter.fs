@@ -167,13 +167,13 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         let res2   = evalExp(e2, vtab, ftab)
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1*n2)
-          | _ -> invalidOperands "Minus on non-integral args: " [(Int, Int)] res1 res2 pos
+          | _ -> invalidOperands "Times on non-integral args: " [(Int, Int)] res1 res2 pos
   | Divide(e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1/n2)
-          | _ -> invalidOperands "Times on non-integral args: " [(Int, Int)] res1 res2 pos  
+          | _ -> invalidOperands "Divide on non-integral args: " [(Int, Int)] res1 res2 pos  
   | And (e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
