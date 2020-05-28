@@ -338,34 +338,25 @@ and checkExp  (ftab : FunTable)
               scan's return type is the same as the type of `arr`,
               while reduce's return type is that of an element of `arr`).
     *)
-    | Scan (f, e_exp, arr_exp, _, pos) -> failwith "hej"
-    (*
-        let (e_type  , e_dec  ) = checkExp ftab vtab e_exp
-        let (arr_type, arr_dec) = checkExp ftab vtab arr_exp
-        let elem_type =
+    | Scan (f, e_exp, arr_exp, _, pos) -> 
+        let (e_exp_type, e_exp_dec) = checkExp ftab vtab e_exp
+        let (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
+        let elem_type = 
             match arr_type with
-              | Array t -> t
-              | _ -> reportTypeWrongKind "third argument of Scan" "array" arr_type pos
-        let (f', f_argres_type) =
+                | Array t -> t
+                | _ -> reportTypeWrongKind "second argument of Scan" "array" arr_type pos
+        let (f', f_arg_type) =
             match checkFunArg ftab vtab pos f with
-              | (f', res, [a1; a2]) ->
-                  if a1 <> a2 then
-                     reportTypesDifferent "argument types of operation in Scan"
-                                          a1 a2 pos
-                  if res <> a1 then
-                     reportTypesDifferent "argument and return type of operation in Scan"
-                                          a1 res pos
-                  (f', res)
-              | (_, res, args) ->
-                  reportArityWrong "operation in Scan" 2 (args,res) pos
-        if elem_type <> f_argres_type then
-          reportTypesDifferent "operation and array-element types in Scan"
-                               f_argres_type elem_type pos
-        if e_type <> f_argres_type then
-          reportTypesDifferent "operation and start-element types in Scan"
-                               f_argres_type e_type pos
-        (f_argres_type, Scan (f', e_dec, arr_dec, elem_type, pos))
-        *)
+                | (f', ranbol, [arg1; arg2]) ->
+                if arg1 = arg2 && arg2 = ranbol then (f', ranbol)
+                else raise(MyError("not functioning", pos))
+                | (_, someRes, args) -> 
+                      raise(MyError("not functioning", pos))
+        if (elem_type = e_exp_type) && (elem_type = f_arg_type) then (Array elem_type, Scan(f',e_exp_dec,arr_exp_dec,elem_type,pos))
+        else reportTypesDifferent "function-argument and array-element types in scan"
+                    f_arg_type elem_type pos
+        (arr_type, Scan(f',e_exp_dec,arr_exp_dec,elem_type,pos))
+
 
 and checkFunArg  (ftab : FunTable)
                  (vtab : VarTable)

@@ -772,8 +772,52 @@ let rec compileExp  (e      : TypedExp)
         the current location of the result iterator at every iteration of
         the loop.
   *)
-  | Scan (_, _, _, _, _) ->
-      failwith "Unimplemented code generation of scan"
+  | Scan (farg, acc_exp, arr_exp, tp, pos) ->
+      let arr_reg = newReg "arr_reg"
+      let size_reg = newReg "size_reg"
+      let ireg_reg = newReg "ireg_reg"
+      let temperay_reg = newReg "temperay_reg"
+      let acc_reg = newReg "acc_reg"
+      let overAddr_reg = newReg "overAddr_reg"
+      let bodyAcc_code = compileExp arr_exp vtable arr_reg
+      let arr_code = compileExp arr_exp vtable arr_reg
+
+      let get_size = [Mips.LW (size_reg, arr_reg, 0)]
+
+      let init_regs = [Mips.ADDI (arr_reg, arr_reg, 4)
+                      ;Mips.ADDI (overAddr_reg, place, 4)
+                      ;Mips.MOVE (ireg_reg, RZ)]
+
+      let loop_beg = newLab "loop_beg"
+      let loop_end = newLab "loop_end"
+      
+      let elem_size = getElemSize tp
+      let loop_head = [Mips.LABEL (loop_beg)
+                      ;Mips.SUB(temperay_reg,ireg_reg,size_reg)
+                      ;Mips.BGEZ(temperay_reg,loop_end)]
+
+      let load_code = [mipsLoad elem_size ( temperay_reg, arr_reg, 0)
+                      ; Mips.ADDI (arr_reg, arr_reg, elemSizeToInt elem_size)
+                      ]
+      let bodyApplying_code = applyFunArg(farg, [acc_reg; temperay_reg], vtable,acc_reg,pos) 
+
+      let bodyStoringOf_code =  [mipsStore elem_size (acc_reg, overAddr_reg, 0)
+                            ;Mips.ADDI (overAddr_reg,overAddr_reg,elemSizeToInt elem_size)
+                            ]
+      let loop_foot =[Mips.ADDI (ireg_reg, ireg_reg, 1)
+                     ;Mips.J loop_beg
+                     ;Mips.LABEL loop_end
+                     ]
+      arr_code
+      @ get_size
+      @ dynalloc (size_reg, place, tp)
+      @ bodyAcc_code
+      @ init_regs
+      @ loop_head
+      @ load_code
+      @ bodyApplying_code
+      @ bodyStoringOf_code
+      @ loop_foot
 
 and applyFunArg ( ff     : TypedFunArg
                 , args   : Mips.reg list
