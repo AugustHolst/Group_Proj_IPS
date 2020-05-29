@@ -263,12 +263,11 @@ let rec compileExp  (e      : TypedExp)
       let code2 = compileExp e2 vtable t2
       code1 @ code2 @ [Mips.MUL (place,t1,t2)]
   | Divide (e1, e2, pos) ->
-      let diverror = nevLab "BreakingBad"
       let t1 = newReg "divide_L"
       let t2 = newReg "divide_R"
       let code1 = compileExp e1 vtable t1
       let code2 = compileExp e2 vtable t2
-      code1 @ code2 @ [Mips.BEQ(t2,RZ,diverror); Mips.DIV (place,t1,t2); Mips.LABLE diverror]
+      code1 @ code2 @ [ Mips.DIV (place, t1, t2) ]
   | Not (e1, pos) ->
       let t1 = newReg "not_L"
       let code1 = compileExp e1 vtable t1

@@ -1,4 +1,1 @@
-Error in /home/aske/ips/af/GroupProject/fasto/bin/../tests/dividebyzero.asm line 30: Runtime exception at 0x00400048: break instruction executed; no code given.
-
-Processing terminated due to errors.
-
+Interpreter error: You're not allowed to divide by 0; expected int, got int (0) instead at line 4, column 6

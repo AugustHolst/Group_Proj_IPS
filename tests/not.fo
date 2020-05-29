@@ -1,0 +1,11 @@
+fun bool write_bool(bool x) = write(x)
+
+fun [bool] main() =
+    let T = true in
+    let F = false in
+    let a = not T in
+    let b = not F in
+    let c = not not not not not not not not T in
+    let d = not not not not not not not not not not F in
+    let arr = {T, F, a, b, c, d} in
+    map(write_bool, arr)
