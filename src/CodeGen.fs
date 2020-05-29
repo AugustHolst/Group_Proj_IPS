@@ -642,8 +642,8 @@ let rec compileExp  (e      : TypedExp)
                         ; Mips.SUB (tmp_reg, i_reg, size_reg)
                         ; Mips.BGEZ (tmp_reg, loop_end)
                         ]
-      let loop_replicate = [ Mips.SW (a_reg, addr_reg, 0)]
-      let loop_footer = [ Mips.ADDI (addr_reg, addr_reg, 4)
+      let loop_replicate = [ mipsStore src_size (a_reg, addr_reg, 0) ]
+      let loop_footer = [ Mips.ADDI (addr_reg, addr_reg, elemSizeToInt src_size)
                         ; Mips.ADDI (i_reg, i_reg, 1)
                         ; Mips.J loop_beg
                         ; Mips.LABEL loop_end
