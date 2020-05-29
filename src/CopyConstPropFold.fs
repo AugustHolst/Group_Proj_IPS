@@ -38,7 +38,14 @@ let rec copyConstPropFoldExp (vtable : VarTable)
                 Should probably do the same as the `Var` case, for
                 the array name, and optimize the index expression `e` as well.
             *)
-            failwith "Unimplemented copyConstPropFold for Index"
+            let nameLookup = SymTab.lookup name vtable
+            let index_e = copyConstPropFoldExp vtable e
+            let arr_val = match nameLookup with
+                | Some(ConstProp valp) -> Constant (valp, pos)
+                | Some(VarProp varp) -> Index (varp, index_e, t, pos)
+                | None -> Index (name, index_e, t, pos)
+            arr_val
+            
         | Let (Dec (name, e, decpos), body, pos) ->
             let e' = copyConstPropFoldExp vtable e
             match e' with

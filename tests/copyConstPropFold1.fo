@@ -3,4 +3,9 @@ fun int main() =
   let array = iota(length) in
   let index = length / 10 in
   let x = array[index] in
+  let waste = array in
+  let y = waste[index] in 
+  let z = y + x in 
   write(x * 1 + 0)
+
+
