@@ -152,16 +152,6 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1-n2)
           | _ -> invalidOperands "Minus on non-integral args: " [(Int, Int)] res1 res2 pos
-  (* TODO: project task 1:
-     Look in `AbSyn.fs` for the arguments of the `Times`
-     (`Divide`,...) expression constructors.
-        Implementation similar to the cases of Plus/Minus.
-        Try to pattern match the code above.
-        For `Divide`, remember to check for attempts to divide by zero.
-        For `And`/`Or`: make sure to implement the short-circuit semantics,
-        e.g., `And (e1, e2, pos)` should not evaluate `e2` if `e1` already
-              evaluates to false.
-  *)
   | Times(e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
@@ -172,6 +162,8 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
         match (res1, res2) with
+          | (_, IntVal 0) -> 
+              invalidOperand "You're not allowed to divide by 0" Int res2 pos
           | (IntVal n1, IntVal n2) -> IntVal (n1/n2)
           | _ -> invalidOperands "Divide on non-integral args: " [(Int, Int)] res1 res2 pos  
   | And (e1, e2, pos) ->
@@ -278,7 +270,6 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
                List.fold (fun acc x -> evalFunArg (farg, vtab, ftab, pos, [acc;x])) nel lst
           | otherwise -> raise (MyError("Third argument of reduce is not an array: " + ppVal 0 arr
                                        , pos))
-
   | Replicate (n, a, tp, pos) ->
         let sz = evalExp(n, vtab, ftab)
         let a_val = evalExp(a, vtab, ftab)
@@ -294,16 +285,6 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
               else let msg = sprintf "Error: In replicate, size is negative: %i" size
                    raise (MyError(msg, pos))
           | _ -> raise (MyError("replicate argument is not a number: "+ppVal 0 sz, pos))
-
-  (* TODO project task 2: `filter(p, arr)`
-       pattern match the implementation of map:
-       - check that the function `p` result type (use `rtpFunArg`) is bool;
-       - evaluate `arr` and check that the (value) result corresponds to an array;
-       - use F# `List.filter` to keep only the elements `a` of `arr` which succeed
-         under predicate `p`, i.e., `p(a) = true`;
-       - create an `ArrayVal` from the (list) result of the previous step.
-  *)
-
   | Filter (p, arrexp, _, pos) ->
         let arr = evalExp(arrexp, vtab, ftab)
         let p_ret_type = rtpFunArg p ftab pos
@@ -313,12 +294,6 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
                let mlst = List.filter (fun x -> (evalFunArg (p, vtab, ftab, pos, [x])) = BoolVal true) lst
                ArrayVal (mlst, tp1)
           | otherwise -> raise (MyError("Second argument of filter is not an array: "+ppVal 0 arr, pos))
-     
-
-  (* TODO project task 2: `scan(f, ne, arr)`
-     Implementation similar to reduce, except that it produces an array
-     of the same type and length to the input array `arr`.
-  *)
   | Scan (farg, ne, arrexp, tp, pos) ->
         let farg_ret_type = rtpFunArg farg ftab pos
         let arr  = evalExp(arrexp,vtab, ftab)

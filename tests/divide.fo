@@ -1,0 +1,17 @@
+fun int write_int(int x) = write(x)
+
+fun [int] write_int_array([int] x) = map(write_int, x)
+
+fun [int] main() =
+    let a = 5 in
+    let b = 5 in
+    let d = 2 in
+    let zero = 0 in
+    let minus = ~8908544 in
+    let big = 92302343 in
+    let ab = 5/5 in
+    let zerod = zero/d in
+    let minusa = minus/a in
+    let bigminus = big/minus in
+    let arr = {ab, zerod, minusa, bigminus} in
+    write_int_array(arr)

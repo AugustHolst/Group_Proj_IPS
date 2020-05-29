@@ -1,5 +1,10 @@
 fun bool writeBool(bool b) = write(b)
 
-fun [bool] main() =
+fun int writeInt(int d) = write(d)
+
+fun [int] main() =
   let fs = replicate(7, false) in
-  map(writeBool, fs)
+  let ints = replicate(5, ~10) in
+  let posints = replicate(3, 2) in
+  let a = map(writeBool, fs) in
+  map(writeInt, ints)

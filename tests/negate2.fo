@@ -1,0 +1,18 @@
+fun int write_int(int x) = write(x)
+
+fun [int] write_int_array([int] x) = map(write_int, x)
+
+fun [int] main() =
+    let a = 5 in
+    let b = 0-5 in
+    let c = 0 in
+    let d = 99999999 in
+    let e = 0-99999999 in
+    let f = ~a in
+    let g = ~b in
+    let h = ~c in
+    let i = ~d in
+    let j = ~e in
+    let k = ~~a in
+    let arr = {f, g, h, i, j, k} in
+    write_int_array(arr)

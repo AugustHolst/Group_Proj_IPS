@@ -1,0 +1,8 @@
+fun int incr(int a, int b) = a + b
+
+fun int writeInt(int n) = write(n)
+
+fun [int] main() =
+  let a = {0-4, 0, 29834928, 0-1387428} in
+  let b = scan(incr, 0, a) in
+  map(writeInt, b)

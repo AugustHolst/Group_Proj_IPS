@@ -1,0 +1,4 @@
+fun int main() =
+    let zero = 0 in
+    let d = 2 in
+    d/zero

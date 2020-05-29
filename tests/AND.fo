@@ -1,0 +1,17 @@
+fun bool writeBool (bool x) = write(x)
+
+fun [bool] main() =
+    let a = true in
+    let b = false in
+    let c = a && b in
+    let d = true in
+    let e = true in
+    let f = d && e in
+    let g = false in
+    let h = true in
+    let i = g && h in
+    let j = false in
+    let k = false in
+    let l = j && k in
+    let arr = {c, f, i, l} in
+    map(writeBool, arr)

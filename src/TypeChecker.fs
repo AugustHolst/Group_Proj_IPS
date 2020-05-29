@@ -280,17 +280,6 @@ and checkExp  (ftab : FunTable)
                                f_argres_type e_type pos
         (f_argres_type, Reduce (f', e_dec, arr_dec, elem_type, pos))
 
-    (* TODO project task 2:
-        See `AbSyn.fs` for the expression constructors of
-        `Replicate`, `Filter`, `Scan`.
-
-        Hints for `replicate(n, a)`:
-        - recursively type check `n` and `a`
-        - check that `n` has integer type
-        - assuming `a` is of type `t` the result type
-          of replicate is `[t]`
-    *)
-
     | Replicate (n_exp, a_exp, tp, pos) ->
         let (e_type, n_exp_dec) = checkExp ftab vtab n_exp
         let (a_type, a_exp_dec) = checkExp ftab vtab a_exp
@@ -301,16 +290,6 @@ and checkExp  (ftab : FunTable)
           | Bool -> (Array Bool, Replicate (n_exp_dec, a_exp_dec, Bool, pos))
           | Char -> (Array Char, Replicate (n_exp_dec, a_exp_dec, Char, pos))
           | _ -> raise (MyError("Replicate second argument is not recognized", pos))
-
-    (* TODO project task 2: Hint for `filter(f, arr)`
-        Look into the type-checking lecture slides for the type rule of `map`
-        and think of what needs to be changed for filter (?)
-        Use `checkFunArg` to get the signature of the function argument `f`.
-        Check that:
-            - `f` has type `ta -> Bool`
-            - `arr` should be of type `[ta]`
-            - the result of filter should have type `[tb]`
-    *)
 
     | Filter (f, arr_exp, _, pos) ->
         let (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
@@ -328,12 +307,6 @@ and checkExp  (ftab : FunTable)
                       f_arg_type elem_type pos
         (Array elem_type, Filter (f', arr_exp_dec, elem_type, pos))
 
-    (* TODO project task 2: `scan(f, ne, arr)`
-        Hint: Implementation is very similar to `reduce(f, ne, arr)`.
-              (The difference between `scan` and `reduce` is that
-              scan's return type is the same as the type of `arr`,
-              while reduce's return type is that of an element of `arr`).
-    *)
     | Scan (f, e_exp, arr_exp, _, pos) -> 
         let (e_exp_type, e_exp_dec) = checkExp ftab vtab e_exp
         let (arr_type, arr_exp_dec) = checkExp ftab vtab arr_exp
@@ -344,15 +317,14 @@ and checkExp  (ftab : FunTable)
         let (f', f_arg_type) =
             match checkFunArg ftab vtab pos f with
                 | (f', ranbol, [arg1; arg2]) ->
-                if arg1 = arg2 && arg2 = ranbol then (f', ranbol)
-                else raise(MyError("not functioning", pos))
+                    if arg1 = arg2 && arg2 = ranbol then (f', ranbol)
+                    else raise(MyError("not functioning", pos))
                 | (_, someRes, args) -> 
                       raise(MyError("not functioning", pos))
-        if (elem_type = e_exp_type) && (elem_type = f_arg_type) then (Array elem_type, Scan(f',e_exp_dec,arr_exp_dec,elem_type,pos))
-        else reportTypesDifferent "function-argument and array-element types in scan"
+        if elem_type <> e_exp_type then
+            reportTypesDifferent "function-argument and array-element types in scan"
                     f_arg_type elem_type pos
-        (arr_type, Scan(f',e_exp_dec,arr_exp_dec,elem_type,pos))
-
+        (Array elem_type, Scan(f', e_exp_dec, arr_exp_dec, elem_type, pos))
 
 and checkFunArg  (ftab : FunTable)
                  (vtab : VarTable)
