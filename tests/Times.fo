@@ -1,0 +1,19 @@
+fun int main() = 
+    let x = 4; y = 10  in 
+    let z = x*y in 
+    let xz = write(z) in
+
+
+    let a = 168; b = 737363 in
+    let testStor =  a * b in
+    let ab1 = write(testStor) in
+
+    let writeParentes = a * ~(b) in
+    let ab2 = write(writeParentes) in
+
+    let writeNegative = ~a*~y in
+    let ab3 = write(writeNegative) in
+
+    let writeNegativeandpositive= ~a*x in
+    write(writeNegativeandpositive) 
+    

@@ -1,0 +1,16 @@
+fun int main() = 
+    let x = 3 ; y = 4
+
+    let bool1 = true in
+    write (bool1)
+    let bool2 = false in
+    write (bool2)
+   
+    let check x y = 
+    if x > y then in
+    write(true)
+
+
+
+
+    
